@@ -19,7 +19,7 @@ export default function Home() {
                 <p className={styles.description}>
                     Our website is under{' '}
                     <code className={styles.code}>development</code>
-                    Its coming very soon 😍
+                    Its coming very soon... 😍
                 </p>
 
                 <img src="/success.jpg" alt="শিক্ষাদীক্ষা"/>
