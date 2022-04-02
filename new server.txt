@@ -1,0 +1,149 @@
+sdedubd.com
+
+=> Create public and private key with puttygen and save them
+=> Create your droplet first in digital ocean
+=> now run putty.exe
+=> copy your server ip address
+=> paste it to the Host Name (or IP address)
+=> connection -> data -> auto-login: root
+=> SSH -> Auth -> upload private key
+=> Go back to session tab
+=> give the session a name in Saved Sessions
+=> save it
+=> then press "open" then "accept" -> only for the first time
+	you are setting up your server
+
+Firewalls: click networking, then firewalls
+=> create the firewall
+
+
+Create a new user:
+=> adduser rouzex
+=> password: 1663RZXsd
+=> id rouzex (checking user details)
+=> usermod -aG sudo rouzex (add to the sudo group)
+=> sudo su - rouzex (login as the created user);
+=> whoami (to see the logged in user name)
+
+
+Authorize the ssh key for the newly created user:
+=> mkdir ~/.ssh
+=> chmod 700 ~/.ssh
+=> nano ~/.ssh/authorized_keys
+	=> you will get an editor,
+	=> type: ssh-rsa (space before the key) paste the public key there,
+	then press ctrl+x, then y to save, then press enter
+=> then change the permission: chmod 600 ~/.ssh/authorized_keys
+=> Then restart the ssh service: sudo service ssh restart
+=> enter the password
+=> run exit command to return to the root user
+=> again run exit command to close the putty.exe
+
+=> run putty.exe
+=> select the session created earlier and then click load
+=> then go to data => change to auto login username to the newly created username
+=> go back to session tab, then save it
+=> then open it up
+
+
+Disable root and password login:
+=> sudo nano /etc/ssh/sshd_config (logged in as root user or newly created user)
+=> Find the line that says PermitRootLogin, PasswordAuthentication (ctrl+w => to search) and
+	change its value from yes to no. (NB: PasswordAuthentication => May be already no);
+	Save and close the file using this method: CTRL-X, then Y, then ENTER.
+=> To reload the SSH daemon and put the changes in live, execute the following command:
+	sudo systemctl reload sshd
+
+=> Password authentication is now disabled.
+	Now your server can only be accessed with SSH key authentication.
+	Let's test logging in using the SSH key.
+	On your local machine, log in to your server using the new
+	account that we created.
+
+
+Install node js:
+=> make sure to stay in the home directory: cd ~
+=> curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+=> sudo apt-get install -y nodejs
+
+=> sudo apt-get install build-essential
+=> node --version
+=> npm --version
+
+
+=> install git: sudo apt-get install git
+=> git --version
+=> git clone https://github.com/Abdur-Razzak-Rouzex/shikkhadeekkha.git website
+	(website: name of the folder where the repo will be cloned)
+
+=> PAT: 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
+    for private repos
+
+=> cd website
+=> npm install
+=> npm run build
+=> npm start
+
+************************          NGINX                       ***************************
+=> go to home directory: cd ~
+=> sudo apt-get update && sudo apt-get install nginx           , then password
+=> test your nginx: systemctl status nginx
+
+
+******************           PM2  *********************
+=> from the root directory: sudo npm install -g pm2
+=> cd test-sd-app
+=> pm2 start --name=test-sd-app npm -- start
+=> pm2 startup systemd
+=> Then copy the command you are given after
+	you run the above the command and run it
+=> To check the status of the new systemd unit, use the following command:
+    systemctl status pm2-rouzex
+
+=> to stop all running pm2: pm2 delete all
+
+***************************         New Push            **********************
+=> In the future, you'll most likely need to push new code updates. To do so, you can follow these steps:
+
+   Push code changes to GitHub/Gitlab.
+   SSH into your DigitalOcean server (i.e. ssh bob@example.com command via a terminal window).
+   Remove the current /website directory with sudo rm -r website (PM2 will continue to run a cached version of the application, so website downtime won't be an issue).
+   Clone your GitHub repository with git clone https://github.com/your_github_username/your_repository_name.git website.
+   Install the project's NPM dependencies with npm install.
+   Run the Next.js build process with npm run build.
+   Restart the PM2 process with pm2 restart website.
+
+
+
+
+
+
+
+***************************************                 Domain Name                 ***********************************
+=> open the Create drop-down menu and click the Domains/DNS link.
+=> In the domain name field, enter your domain (this is usually the base only:
+    example.com and not www.example.com) and click the Add Domain button.
+    => hit "Add Domain" button
+
+=> Now you'll be taken to the Create new record page.
+
+=> You now need to add NS records for the domain on DigitalOcean's systems. You'll only be adding 'A' records,
+    which maps an IPv4 address to a domain name. This will determine where DigitalOcean should direct any
+    requests for your domain name to.
+
+=> We want your website to be accessible at two different base URLs:
+    example.com
+    www.example.com
+    Therefore, we need to create two A records for your domain.
+
+=> For the first one, enter @ in the HOSTNAME field and select the server you want to point the domain name to:
+    then click "Create Record"
+
+=> For the second one, enter www in the HOSTNAME field and select the same server:
+    then click "Create Record"
+
+Awesome, we can move onto the next step.
+
+
+**************      Configure Your Domain Registrar To Direct Domains To DigitalOcean       **************
+follow the blog:    https://www.coderrocketfuel.com/article/how-to-deploy-a-next-js-website-to-a-digital-ocean-server
